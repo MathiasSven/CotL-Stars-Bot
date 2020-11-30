@@ -114,10 +114,12 @@ class Commands(commands.Cog):
         """
         await asyncio.sleep(0.5)
         await ctx.message.delete()
-        regex = re.compile(r'^<@!\d*>$')
-        if regex.match(member) is not None:
+        regex = re.compile(r'^<@!?(?P<id>\d*)>$')
+        regex_match = regex.match(member)
+        if regex_match is not None:
+            user_id = regex_match.group("id")
             var_ = member
-            member = await Recipient.get_or_none(id=member[3:-1])
+            member = await Recipient.get_or_none(id=user_id)
 
             if member is None:
                 member = type('_', (object,), {'star_count': 0, 'mention': var_})()
@@ -150,9 +152,11 @@ class Commands(commands.Cog):
         """
         await asyncio.sleep(0.5)
         await ctx.message.delete()
-        regex = re.compile(r'^<@!\d*>$')
-        if regex.match(member) is not None:
-            member = await Recipient.get(id=member[3:-1])
+        regex = re.compile(r'^<@!?(?P<id>\d*)>$')
+        regex_match = regex.match(member)
+        if regex_match is not None:
+            user_id = regex_match.group("id")
+            member = await Recipient.get(id=user_id)
             if member.star_count == 0:
                 embed = discord.Embed(description=f"**{member.mention()} has no stars.**", colour=discord.Colour(self.COLOUR))
             else:
@@ -172,11 +176,13 @@ class Commands(commands.Cog):
         """
         # await asyncio.sleep(0.5)
         # await ctx.message.delete()
-        regex = re.compile(r'^<@!\d*>$')
-        if regex.match(member) is not None:
+        regex = re.compile(r'^<@!?(?P<id>\d*)>$')
+        regex_match = regex.match(member)
+        if regex_match is not None:
+            user_id = regex_match.group("id")
             if len(reason) > 64:
                 raise errors.CommandInvokeError(e="Reason given surpasses 64 characters.")
-            recipient, _ = await Recipient.get_or_create(id=member[3:-1])
+            recipient, _ = await Recipient.get_or_create(id=user_id)
             await Star.create(recipient=recipient, presenter_id=ctx.message.author.id, reason=reason)
             await ctx.send(f"{ctx.message.author.mention}, star added.")
         else:
