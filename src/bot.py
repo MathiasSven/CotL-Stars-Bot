@@ -100,6 +100,8 @@ class Commands(commands.Cog):
         else:
             for recipient in recipients:
                 stars_amount = recipient.star_count
+                if stars_amount == 0:
+                    continue
                 leaderboard_str += f"<@{recipient.id}>: {stars_amount} Star{'s' if stars_amount >= 2 else ''}\n"
 
         embed = discord.Embed(description=f"**⭐ Star Leaderboard**\n"
@@ -199,7 +201,7 @@ class Commands(commands.Cog):
         star = await Star.get_or_none(id=star_id)
         if star is not None:
             await star.delete()
-            await ctx.send(f"{ctx.message.author.mention}, star #{star.id} for {await star.recipient.metion} deleted.")
+            await ctx.send(f"{ctx.message.author.mention}, star #{star.id} for {await star.recipient.mention} deleted.")
         else:
             raise errors.CommandInvokeError(e=f"Star with id {star_id} does not exits.")
 
